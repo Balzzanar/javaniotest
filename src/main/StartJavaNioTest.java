@@ -32,6 +32,7 @@ public class StartJavaNioTest {
         } catch(Exception e) {
             e.printStackTrace();
             LOGGER.warning("Fail!");
+            LOGGER.warning("Fail!");
         }
     }
 
