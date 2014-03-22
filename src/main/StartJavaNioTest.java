@@ -1,13 +1,13 @@
 package main;
 
+import dto.DwnFile;
 import log.WFormatter;
+import singelton.FileQueueSingelton;
+import workers.Downloader;
+import workers.LinksParser;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
+import java.io.File;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,43 +20,20 @@ public class StartJavaNioTest {
         initLogger();
         LOGGER = Logger.getLogger("wlogger");
 
-        try {
-            URL website = new URL("http://upload.wikimedia.org/wikipedia/commons/b/b7/Big_smile.png");
-            LOGGER.info(String.format("Total file size:%s", getFileSize(website)));
+        List<DwnFile> listDF = new LinksParser().parse();
+        for (DwnFile df : listDF){
+            try {
+                FileQueueSingelton.getClientQueue().put(df);
 
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-            FileOutputStream fos = new FileOutputStream("junk/smile.png");
-            LOGGER.warning("Download starting...");
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            LOGGER.warning("Done downloaded a file!");
-        } catch(Exception e) {
-            e.printStackTrace();
-            LOGGER.warning("Fail!");
-            LOGGER.warning("Fail!");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-    }
+        LOGGER.info(String.format("Queue at %s Files", FileQueueSingelton.getClientQueue().size()));
 
-    /**
-     * Returns the file size for a file given its url.
-     *
-     * @param url, url to file
-     * @return file size
-     */
-    private static int getFileSize(URL url) {
-        HttpURLConnection conn = null;
-        try {
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("HEAD");
-            conn.getInputStream();
-            return conn.getContentLength();
-        } catch (IOException e) {
-            return -1;
-        } finally {
-            assert conn != null;
-            conn.disconnect();
-        }
+        new Downloader().start();
+        new Downloader().start();
     }
-
 
     private static void initLogger() {
         Logger l = Logger.getLogger("wlogger");
