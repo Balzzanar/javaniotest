@@ -15,15 +15,15 @@ public class DwnFile {
     private URL url;
     private String category;
     private int filesize;
+    private String id;
     private String filename;
 
-    public DwnFile(String name, String url, String category) throws MalformedURLException {
+    public DwnFile(String name, String url, String category, String id) throws MalformedURLException {
         this.name = name;
         this.url = new URL(url);
         this.category = category;
-        this.filesize = filesize;
         String[] temp = url.split("\\.");
-        this.filename = this.name + "." + temp[temp.length -1];
+        this.filename = String.format("%s__%s.%s", this.name, id, temp[temp.length -1]);
     }
 
     /* Getters */

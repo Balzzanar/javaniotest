@@ -3,10 +3,11 @@ package main;
 import dto.DwnFile;
 import log.WFormatter;
 import singelton.FileQueueSingelton;
+import singelton.PendingDownloadsSingelton;
 import workers.Downloader;
+import workers.FileChecker;
 import workers.LinksParser;
 
-import java.io.File;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -31,6 +32,8 @@ public class StartJavaNioTest {
         }
         LOGGER.info(String.format("Queue at %s Files", FileQueueSingelton.getClientQueue().size()));
 
+        PendingDownloadsSingelton.getPendingDownloads();
+        new FileChecker().start();
         new Downloader().start();
         new Downloader().start();
     }

@@ -1,5 +1,9 @@
 package workers;
 
+import dto.DwnFile;
+import singelton.PendingDownloadsSingelton;
+
+import java.io.File;
 import java.util.logging.Logger;
 
 /**
@@ -11,6 +15,7 @@ import java.util.logging.Logger;
 public class FileChecker extends Thread {
 
     private static Logger LOGGER;
+    private static final String PATH_TO_JUNK_FOLDER = "junk/";
 
     public FileChecker() {
         super();
@@ -24,14 +29,30 @@ public class FileChecker extends Thread {
 
         while (true){
             try{
-            LOGGER.info(String.format("Will sleep for 5s"));
-            Thread.sleep(5000);
+                Thread.sleep(10000);
 
+                LOGGER.info(String.format("--------------------PROGRESS REPORT-------------------------"));
+                for (DwnFile df : PendingDownloadsSingelton.getPendingDownloads()){
+                    Long size = getFileSizeInPath(df.getFilename());
+                    float p = ((float)(size) / (float) df.getFilesize()) * 100;
+                    LOGGER.info(String.format("File: %s, is at: %s percent (%s)", df.getName(), p, df.getFilesize() - size));
+                }
+                LOGGER.info(String.format("-------------------END PROGRESS REPORT-----------------------"));
 
             }catch (Exception e){
-
+                e.printStackTrace();
             }
 
         }
     }
+
+    private long getFileSizeInPath(String path) {
+        File f = new File(PATH_TO_JUNK_FOLDER + path);
+        if(f.exists()){
+            return f.length();
+        }
+        return -1;
+    }
+
+
 }

@@ -2,6 +2,7 @@ package workers;
 
 import dto.DwnFile;
 import singelton.FileQueueSingelton;
+import singelton.PendingDownloadsSingelton;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,7 +47,11 @@ public class Downloader extends Thread{
         LOGGER = Logger.getLogger("wlogger");
 
         try {
-            LOGGER.info(String.format("Total file size:%s", getFileSize(df.getUrl())));
+            int fs = getFileSize(df.getUrl());
+            LOGGER.info(String.format("Total file size:%s", fs));
+            df.setFilesize(fs);
+
+            PendingDownloadsSingelton.addDownload(df);
 
             ReadableByteChannel rbc = Channels.newChannel(df.getUrl().openStream());
             FileOutputStream fos = new FileOutputStream("junk/" + df.getFilename());

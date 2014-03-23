@@ -53,7 +53,8 @@ public class LinksParser {
         for (String line : eachLine){
             String[] pipSepataion = line.split("\\|");
             try {
-                listDF.add(new DwnFile(pipSepataion[1].trim(), pipSepataion[3].trim(), pipSepataion[2].trim()));
+                // |<id>|<name>|<url>|<category>
+                listDF.add(new DwnFile(pipSepataion[2].trim(), pipSepataion[4].trim(), pipSepataion[3].trim(), pipSepataion[1].trim()));
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();

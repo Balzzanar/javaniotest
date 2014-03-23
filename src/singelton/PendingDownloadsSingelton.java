@@ -29,6 +29,7 @@ public class PendingDownloadsSingelton {
     public static List<DwnFile> getPendingDownloads(){
         if(pendingDownloads == null) {
             LOGGER = Logger.getLogger("wlogger");
+            LOGGER.info(String.format("Started a new pending list"));
             pendingDownloads = new ArrayList<>();
         }
         return pendingDownloads;
@@ -36,13 +37,15 @@ public class PendingDownloadsSingelton {
 
     public static void addDownload(DwnFile df){
         synchronized (pendingDownloads){
-            pendingDownloads.add(df);
+            getPendingDownloads().add(df);
+            LOGGER.info(String.format("Added a new file to pending list."));
         }
     }
 
     public static void removeDownload(DwnFile df){
         synchronized (pendingDownloads){
-            pendingDownloads.remove(df);
+            getPendingDownloads().remove(df);
+            LOGGER.info(String.format("Removed a file form pending list."));
         }
     }
 
